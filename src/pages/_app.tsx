@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 export default function EmbedGenerator({ Component, pageProps }: AppProps) {
-	const title = "Discord Embed Generator";
+	const title = "Embed Generator";
 	const description = "A tool to build Discord embeds as json to be used in different projects";
 
 	const [win, setWindow] = useState<Window>();
