@@ -2,6 +2,7 @@ Dockerfile
 docker-compose.yml
 build.sh
 run.sh
+clean.sh
 /docker
 /materials
 EmbedGenerator.code-workspace
