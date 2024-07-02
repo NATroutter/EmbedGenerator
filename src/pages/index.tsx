@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import DiscordEmbed from "../components/DiscordEmbed";
 import LimitedInput from "../components/LimitedInput";
@@ -30,6 +30,13 @@ function setAllDetails(open: boolean) {
 	}
 }
 
+const defaultVariables : Variable[] = [
+	{
+		name: "var1",
+		value: "Foxes are cute!"
+	}
+]
+
 export default function Home() {
 	const [authorIcon, setAuthorIcon] = useState("");
 	const [authorName, setAuthorName] = useState("");
@@ -52,17 +59,57 @@ export default function Home() {
 	const [timestamp, setTimestamp] = useState<number | undefined>(undefined);
 
 	const [embedLoaded, setEmbedLoaded] = useState(false);
-
+	const [variablesLoaded, setVariablesLoaded] = useState(false);
 	const [variableFormat, setVariableFormat] = useState<string>("{@}");
-
-
 	const [error, setError] = useState<string | undefined>(undefined);
-
 	const router = useRouter();
-
 	const [rootUrl, setRootUrl] = useState('');
-
 	const [infoEmbed, setInfoEmbed] = useState<Embed>();
+
+	const fileInput = useRef<HTMLInputElement>(null);
+
+
+	useEffect(() => {
+		const initializeEmbed = async () => {
+			const protocol = window.location.protocol;
+			const host = window.location.host;
+			const newRootUrl = `${protocol}//${host}`;
+			setRootUrl(newRootUrl);
+
+			const embedTemplate: Embed = {
+				author: {
+				name: "Mr. Fox",
+				url: "https://en.wikipedia.org/wiki/Fox",
+				iconUrl: `${newRootUrl}/img/fox1.jpg`
+				},
+				title: "Foxes are cool!",
+				url: "https://en.wikipedia.org/wiki/Fox",
+				description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
+				color: "#ff0000",
+				fields: [
+				{
+					name: "Field #1",
+					value: "Content of Field #1",
+					inline: true
+				},
+				{
+					name: "Field #2",
+					value: "Content of Field #2",
+					inline: true
+				}
+				],
+				image: `${newRootUrl}/img/fox2.jpg`,
+				thumbnail: `${newRootUrl}/img/fox.jpg`,
+				footer: {
+				text: "Yes, this is all about foxes!",
+				iconUrl: `${newRootUrl}/img/fox_emoji.png`,
+				},
+				timestamp: moment().unix()
+			};
+			setInfoEmbed(embedTemplate);
+		};
+		initializeEmbed();
+	}, []);
 
 	useEffect(() => {
 		const initializeEmbed = async () => {
@@ -79,7 +126,7 @@ export default function Home() {
 			},
 			title: "Foxes are cool!",
 			url: "https://en.wikipedia.org/wiki/Fox",
-			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
+			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using placeholders:**\nVar1: {var1}\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
 			color: "#ff0000",
 			fields: [
 			{
@@ -109,36 +156,25 @@ export default function Home() {
 
 	useEffect(() => {
 		const loadEmbedData = async () => {
-			if (!router.isReady || !infoEmbed) return;
-
-			const { data } = router.query;
-
-			if (!data) {
-				if (!embedLoaded) {
+			if (!infoEmbed) return;
+			if (!embedLoaded) {
 				loadEmbed(infoEmbed);
 				setEmbedLoaded(true);
-				}
-				return;
-			}
-
-			try {
-				let embed: any;
-
-				const embedString = Array.isArray(data) ? data[0] : data;
-
-				embed = JSON.parse(atob(embedString));
-
-				loadEmbed(embed);
-			} catch (e) {
-				loadEmbed(infoEmbed);
-				setError("An error occurred while importing the embed!");
-			} finally {
-				router.push("/", "/", { shallow: true });
 			}
 		};
-
 		loadEmbedData();
 	}, [router.isReady, infoEmbed, router, embedLoaded]);
+
+	useEffect(() => {
+		const loadVaraibleData = async () => {
+			if (!defaultVariables) return;
+			if (!variablesLoaded) {
+				loadVariables(defaultVariables);
+				setVariablesLoaded(true);
+			}
+		};
+		loadVaraibleData();
+	}, [router, variables, variablesLoaded]);
 
 	useEffect(() => {
 		const totalCharacters =
@@ -217,6 +253,83 @@ export default function Home() {
 
 	function getRandom(min: number, max: number): number {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+		const handleFileChange = () => {
+		const file = fileInput.current?.files?.[0];
+		if (file && file.type === "application/json") {
+			const reader = new FileReader();
+			reader.onload = () => {
+				var data : string | undefined = reader.result?.toString();
+				if (data === undefined) {
+					setError("Invalid file content!")
+					return;
+				}
+				try {
+					var json = JSON.parse(data)
+					loadJson(json);
+				} catch(err) {
+					setError("Invalid Json!")
+				}
+
+
+			};
+			reader.readAsText(file);
+		}
+	};
+	function isValid(value : any) : boolean {
+		return (value !== undefined && value !== null && String(value).length > 0)
+	}
+	function loadJson(data : any) {
+		var embed = data.embed;
+		var vars = data.variables
+
+		setAuthorIcon(embed?.author?.iconUrl ?? "");
+		setAuthorName(embed?.author?.name ?? "");
+		setAuthorUrl(embed?.author?.url ?? "");
+
+		setTitle(embed?.title ?? "");
+		setUrl(embed?.url ?? "");
+		setDescription(embed?.description ?? "");
+
+		if (isValid(embed?.fields)) {
+			setFields(embed.fields
+			.map((e:EmbedField) => ({
+				name: e.name?.trim() ?? undefined,
+				value: e.value?.trim() ?? undefined
+			})).filter((e:EmbedField) => e.name !== undefined && e.value !== undefined));
+		} else {
+			setFields([])
+		}
+
+		setImage(embed?.image?.url ?? "");
+		setThumbnail(embed?.thumbnail?.url ?? "");
+
+		if (embed?.color) setColor(embed?.color);
+		setColorEnabled(embed?.color !== undefined);
+
+		setFooterText(embed?.footer?.text ?? "");
+		setFooterIcon(embed?.footer?.iconUrl ?? "");
+
+		setTimestamp(embed?.timestamp);
+
+		if (isValid(vars)) {
+			setVariables(vars
+			.map((e:Variable) => ({
+				name: e.name?.trim() ?? undefined,
+				value: e.value?.trim() ?? undefined
+			})).filter((e:Variable) => e.name !== undefined && e.value !== undefined));
+		} else {
+			setVariables([])
+		}
+
+		setEmbedLoaded(true);
+		setVariablesLoaded(true);
+	}
+
+	function loadVariables(vars: Variable[]) {
+		setVariables(vars);
+		setVariablesLoaded(true);
 	}
 
 	function loadEmbed(embed: Embed) {
@@ -364,6 +477,15 @@ export default function Home() {
 							className={button()}
 						>
 							Collapse All
+						</button>
+
+						<input type="file" hidden accept="application/json" ref={fileInput} onChange={handleFileChange} />
+						<button
+							type="button"
+							onClick={() => fileInput.current?.click()}
+							className={button()}
+						>
+							Import
 						</button>
 
 					</div>
@@ -713,7 +835,7 @@ export default function Home() {
 
 				<DiscordEmbed embed={repalceVars(embed)} />
 
-				<Output embed={embed} />
+				<Output embed={embed} variables={variables} />
 			</div>
 		</div>
 	);

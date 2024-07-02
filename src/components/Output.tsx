@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Embed } from "../lib/interfaces";
 import { embedToObjectCode } from "../lib/utils";
 import Highlight from "./Highlight";
+import { Variable } from '../lib/interfaces';
 
 function s(strings: TemplateStringsArray, ...values: unknown[]) {
 	let escaped = "";
@@ -17,16 +18,14 @@ function s(strings: TemplateStringsArray, ...values: unknown[]) {
 	return escaped;
 }
 
-export default function Output({ embed }: { embed: Embed }) {
+export default function Output({ embed, variables }: { embed: Embed, variables: Variable[] }) {
 	const [language, setLanguage] = useState<"json">("json");
 	const [jsVersion, setJsVersion] = useState("14");
 	const [jsMode, setJsMode] = useState("chained");
 	const [rsMode, setRsMode] = useState("variable"); // variable or closure
 	const [rsFields, setRsFields] = useState("together"); // together or separate
 
-	let output = "";
-
-	output = embedToObjectCode(embed, false);
+	let output = embedToObjectCode(embed, variables, false);
 
 	return (
 		<div className="mt-8">

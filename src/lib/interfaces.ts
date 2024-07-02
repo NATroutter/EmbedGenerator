@@ -1,6 +1,12 @@
 /**
  * Represents a Discord message embed.
  */
+
+export interface outputData {
+	embed: Embed
+	variables: Variable[]
+}
+
 export interface Embed {
 	/**
 	 * Embed title.
