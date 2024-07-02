@@ -15,7 +15,7 @@ function ellipses(str: string, max = 50) {
 function button(type: "blue" | "red" | "disabled" = "blue") {
 	return `font-medium py-1 px-2 rounded transition ${
 		type === "blue"
-			? "bg-[#5865f2] hover:bg-[#4752c4] text-white"
+			? "bg-[#d83c3e] hover:bg-[#a12d2f] text-white"
 			: type === "red"
 			? "bg-[#d83c3e] hover:bg-[#a12d2f] text-white"
 			: "bg-[#4f545c] cursor-not-allowed"
@@ -432,13 +432,13 @@ export default function Home() {
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
 				<div>
-					<div className="flex justify-between items-baseline">
+					<div className="flex justify-center items-baseline">
 						<h1 className="text-white font-semibold text-2xl">
 							Discord Embed Generator
 						</h1>
 					</div>
 
-					<div className="flex mt-2 gap-2">
+					<div className="flex mt-2 gap-2 justify-center">
 						<button
 							type="button"
 							onClick={() => {
