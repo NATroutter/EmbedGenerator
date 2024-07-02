@@ -32,8 +32,8 @@ function setAllDetails(open: boolean) {
 
 const defaultVariables : Variable[] = [
 	{
-		name: "var1",
-		value: "Foxes are cute!"
+		name: "ph1",
+		value: "Foxes are so adorable <3"
 	}
 ]
 
@@ -63,7 +63,6 @@ export default function Home() {
 	const [variableFormat, setVariableFormat] = useState<string>("{@}");
 	const [error, setError] = useState<string | undefined>(undefined);
 	const router = useRouter();
-	const [rootUrl, setRootUrl] = useState('');
 	const [infoEmbed, setInfoEmbed] = useState<Embed>();
 
 	const fileInput = useRef<HTMLInputElement>(null);
@@ -74,35 +73,34 @@ export default function Home() {
 			const protocol = window.location.protocol;
 			const host = window.location.host;
 			const newRootUrl = `${protocol}//${host}`;
-			setRootUrl(newRootUrl);
 
 			const embedTemplate: Embed = {
 				author: {
 				name: "Mr. Fox",
 				url: "https://en.wikipedia.org/wiki/Fox",
-				iconUrl: `${newRootUrl}/img/fox1.jpg`
+				iconUrl: `${newRootUrl}/assets/img/foxes/fox1.jpg`
 				},
 				title: "Foxes are cool!",
 				url: "https://en.wikipedia.org/wiki/Fox",
 				description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
 				color: "#ff0000",
 				fields: [
-				{
-					name: "Field #1",
-					value: "Content of Field #1",
-					inline: true
-				},
-				{
-					name: "Field #2",
-					value: "Content of Field #2",
-					inline: true
-				}
+					{
+						name: "Field #1",
+						value: "Content of Field #1",
+						inline: true
+					},
+					{
+						name: "Field #2",
+						value: "Content of Field #2",
+						inline: true
+					}
 				],
-				image: `${newRootUrl}/img/fox2.jpg`,
-				thumbnail: `${newRootUrl}/img/fox.jpg`,
+				image: `${newRootUrl}/assets/img/foxes/fox2.jpg`,
+				thumbnail: `${newRootUrl}/assets/img/foxes/fox.jpg`,
 				footer: {
 				text: "Yes, this is all about foxes!",
-				iconUrl: `${newRootUrl}/img/fox_emoji.png`,
+				iconUrl: `${newRootUrl}/assets/img/foxes/fox_emoji.png`,
 				},
 				timestamp: moment().unix()
 			};
@@ -116,17 +114,16 @@ export default function Home() {
 		const protocol = window.location.protocol;
 		const host = window.location.host;
 		const newRootUrl = `${protocol}//${host}`;
-		setRootUrl(newRootUrl);
 
 		const embedTemplate: Embed = {
 			author: {
 			name: "Mr. Fox",
 			url: "https://en.wikipedia.org/wiki/Fox",
-			iconUrl: `${newRootUrl}/img/fox1.jpg`
+			iconUrl: `${newRootUrl}/assets/img/foxes/fox1.jpg`
 			},
 			title: "Foxes are cool!",
 			url: "https://en.wikipedia.org/wiki/Fox",
-			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using placeholders:**\nVar1: {var1}\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
+			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using placeholders:**\nPH1: {ph1}\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
 			color: "#ff0000",
 			fields: [
 			{
@@ -140,11 +137,11 @@ export default function Home() {
 				inline: true
 			}
 			],
-			image: `${newRootUrl}/img/fox2.jpg`,
-			thumbnail: `${newRootUrl}/img/fox.jpg`,
+			image: `${newRootUrl}/assets/img/foxes/fox2.jpg`,
+			thumbnail: `${newRootUrl}/assets/img/foxes/fox.jpg`,
 			footer: {
 			text: "Yes, this is all about foxes!",
-			iconUrl: `${newRootUrl}/img/fox_emoji.png`,
+			iconUrl: `${newRootUrl}/assets/img/foxes/fox_emoji.png`,
 			},
 			timestamp: moment().unix()
 		};
@@ -187,7 +184,7 @@ export default function Home() {
 		if (totalCharacters > 6000) {
 			setError("The total number of characters in the embed content must not exceed 6000!");
 		} else {
-			setError(""); // Clear the error if no issues
+			setError(undefined); // Clear the error if no issues
 		}
 	}, [title, description, fields, footerText, authorName]);
 
@@ -216,7 +213,7 @@ export default function Home() {
 			return;
 		}
 
-		setError("");
+		setError(undefined);
 
 	}, [variableFormat]);
 
@@ -247,7 +244,7 @@ export default function Home() {
 		} else if (variables[0] != undefined && variables[0].name.length > 10) {
 			setError("Placeholder error!");
 		} else {
-			setError(""); // Clear the error if no issues
+			setError(undefined); // Clear the error if no issues
 		}
 	}, [variables]);
 
@@ -358,8 +355,11 @@ export default function Home() {
 	}
 
 	function replaceVar(entry: string, variable: Variable) : string {
-		var format = variableFormat.replace("@",variable.name);
-		return entry.replace(format, variable.value);
+		if (variableFormat.includes("@")) {
+			var format = variableFormat.replace("@",variable.name);
+			return entry.replace(format, variable.value);
+		}
+		return entry;
 	}
 
 	function replaceVars(entry: string) : string {
@@ -431,14 +431,11 @@ export default function Home() {
 	return (
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
+				<div className="flex justify-center items-baseline title-container">
+					<img className="title" src="/assets/img/title.png" alt="" />
+				</div>
 				<div>
-					<div className="flex justify-center items-baseline">
-						<h1 className="text-white font-semibold text-2xl">
-							Discord Embed Generator
-						</h1>
-					</div>
-
-					<div className="flex mt-2 gap-2 justify-center">
+					<div className="flex mt-1 mb-1 gap-2 justify-center">
 						<button
 							type="button"
 							onClick={() => {
@@ -833,9 +830,9 @@ export default function Home() {
 
 			<div className="flex-1 bg-[#36393f] p-8">
 
-				<DiscordEmbed embed={repalceVars(embed)} />
+				<DiscordEmbed embed={repalceVars(embed)} errors={error} />
 
-				<Output embed={embed} variables={variables} />
+				<Output embed={embed} variables={variables} errors={error} />
 			</div>
 		</div>
 	);

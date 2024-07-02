@@ -1,3 +1,7 @@
-# Discord Embed Creator
+# Discord Embed Generator
 
-Generate code for embeds in discord.js and discord.py!
+A tool to build Discord embeds as json to be used in different projects
+
+
+This project has been forked from [discord-embed-creator
+](https://github.com/cubedhuang/discord-embed-creator)

@@ -1,10 +1,17 @@
 import type { Embed, EmbedField } from "../lib/interfaces";
 import Markdown from "../lib/markdown/Markdown";
 import moment from 'moment';
-import { timeStamp } from 'console';
 
-export default function DiscordEmbed({ embed }: { embed: Embed }) {
+export default function DiscordEmbed({ embed, errors } : { embed: Embed, errors: string | undefined}) {
 	const fieldRows: EmbedField[][] = [];
+
+	console.log(errors)
+
+	if (errors !== undefined) {
+		return (
+			<div></div>
+		);
+	}
 
 	for (const field of embed.fields) {
 		if (

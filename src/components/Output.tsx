@@ -18,12 +18,15 @@ function s(strings: TemplateStringsArray, ...values: unknown[]) {
 	return escaped;
 }
 
-export default function Output({ embed, variables }: { embed: Embed, variables: Variable[] }) {
+export default function Output({ embed, variables, errors }: { embed: Embed, variables: Variable[], errors: string | undefined }) {
 	const [language, setLanguage] = useState<"json">("json");
-	const [jsVersion, setJsVersion] = useState("14");
-	const [jsMode, setJsMode] = useState("chained");
-	const [rsMode, setRsMode] = useState("variable"); // variable or closure
-	const [rsFields, setRsFields] = useState("together"); // together or separate
+
+	if (errors !== undefined) {
+		return (
+			<div className="mt-8">
+			</div>
+		);
+	}
 
 	let output = embedToObjectCode(embed, variables, false);
 
@@ -31,10 +34,7 @@ export default function Output({ embed, variables }: { embed: Embed, variables: 
 		<div className="mt-8">
 			<h2 className="text-xl font-semibold text-white">Output</h2>
 
-			<Highlight
-				language={language === "json" ? "js" : language}
-				className="rounded text-sm"
-			>
+			<Highlight className="rounded text-sm">
 				{output}
 			</Highlight>
 		</div>

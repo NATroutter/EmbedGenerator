@@ -7,8 +7,8 @@
 		font-family: "Whitney";
 		font-style: "normal";
 		font-weight: #{$i}00;
-		src: url("/font/whitney-#{$i}00.woff2") format("woff2"),
-			url("/font/whitney-#{$i}00.woff") format("woff");
+		src: url("/assets/font/whitney-#{$i}00.woff2") format("woff2"),
+			url("/assets/font/whitney-#{$i}00.woff") format("woff");
 		font-display: "swap";
 	}
 }
@@ -91,6 +91,12 @@
 
 	input[type="datetime-local"] {
 		color-scheme: dark;
+	}
+	.title-container {
+		background-color: transparent !important;
+	}
+	.title {
+		max-width: 85%;
 	}
 }
 
