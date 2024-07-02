@@ -1,3 +1,4 @@
+
 import "../styles/globals.scss";
 
 import type { AppProps } from "next/app";
@@ -29,12 +30,14 @@ export default function EmbedGenerator({ Component, pageProps }: AppProps) {
 
 				<meta name="description" content={description} />
 
+				<link rel="icon" href="/assets/icons/favicon.ico?v=1" sizes="any"/>
+				<link rel="shortcut icon" href="/assets/icons/favicon.ico?v=1" />
+
 				<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=1"/>
 				<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=1"/>
 				<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=1"/>
 				<link rel="manifest" href="/assets/icons/site.webmanifest?v=1"/>
 				<link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg?v=1" color="#414141"/>
-				<link rel="shortcut icon" href="/assets/icons/favicon.ico?v=1"/>
 				<meta name="msapplication-TileColor" content="#414141"/>
 				<meta name="msapplication-config" content="/assets/icons/browserconfig.xml?v=1"/>
 				<meta name="theme-color" content="#414141"/>

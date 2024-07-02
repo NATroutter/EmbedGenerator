@@ -5,8 +5,6 @@ import moment from 'moment';
 export default function DiscordEmbed({ embed, errors } : { embed: Embed, errors: string | undefined}) {
 	const fieldRows: EmbedField[][] = [];
 
-	console.log(errors)
-
 	if (errors !== undefined) {
 		return (
 			<div></div>
