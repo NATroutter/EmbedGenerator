@@ -1,13 +1,12 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import Copier from "../components/Copier";
 import DiscordEmbed from "../components/DiscordEmbed";
 import LimitedInput from "../components/LimitedInput";
 import Output from "../components/Output";
 import ValueInput from "../components/ValueInput";
-import { Embed, EmbedField } from "../lib/interfaces";
-import { embedToPartial } from "../lib/utils";
+import { Embed, EmbedField, Variable } from '../lib/interfaces';
+import moment from 'moment';
 
 function ellipses(str: string, max = 50) {
 	return str.length > max ? `${str.slice(0, max - 3)}...` : str;
@@ -31,66 +30,6 @@ function setAllDetails(open: boolean) {
 	}
 }
 
-const infoEmbed: Embed = {
-	author: {
-		name: "Info",
-		url: "https://example.com",
-		iconUrl: ""
-	},
-	title: "Example Title",
-	url: "https://example.com",
-	description: `This is an example description. Markdown works too!
-
-https://automatic.links
-> Block Quotes
-\`\`\`
-Code Blocks
-\`\`\`
-*Emphasis* or _emphasis_
-\`Inline code\` or \`\`inline code\`\`
-[Links](https://example.com)
-<@123>, <@!123>, <#123>, <@&123>, @here, @everyone mentions
-||Spoilers||
-~~Strikethrough~~
-**Strong**
-__Underline__`,
-	color: "#00b0f4",
-	fields: [
-		{
-			name: "Field Name",
-			value: "This is the field value.",
-			inline: false
-		},
-		{
-			name: "The first inline field.",
-			value: "This field is inline.",
-			inline: true
-		},
-		{
-			name: "The second inline field.",
-			value: "Inline fields are stacked next to each other.",
-			inline: true
-		},
-		{
-			name: "The third inline field.",
-			value: "You can have up to 3 inline fields in a row.",
-			inline: true
-		},
-		{
-			name: "Even if the next field is inline...",
-			value: "It won't stack with the previous inline fields.",
-			inline: true
-		}
-	],
-	image: "https://cubedhuang.com/images/alex-knight-unsplash.webp",
-	thumbnail: "https://dan.onl/images/emptysong.jpg",
-	footer: {
-		text: "Example Footer",
-		iconUrl: "https://slate.dan.onl/slate.png"
-	},
-	timestamp: Date.now()
-};
-
 export default function Home() {
 	const [authorIcon, setAuthorIcon] = useState("");
 	const [authorName, setAuthorName] = useState("");
@@ -103,6 +42,7 @@ export default function Home() {
 	const [colorEnabled, setColorEnabled] = useState(true);
 
 	const [fields, setFields] = useState<EmbedField[]>([]);
+	const [variables, setVariables] = useState<Variable[]>([]);
 
 	const [image, setImage] = useState("");
 	const [thumbnail, setThumbnail] = useState("");
@@ -113,39 +53,80 @@ export default function Home() {
 
 	const [embedLoaded, setEmbedLoaded] = useState(false);
 
-	const [error, setError] = useState<string | undefined>(undefined);
+	const [variableFormat, setVariableFormat] = useState<string>("{@}");
 
-	const [modal, setModal] = useState(false);
+
+	const [error, setError] = useState<string | undefined>(undefined);
 
 	const router = useRouter();
 
+	const [rootUrl, setRootUrl] = useState('');
+
+	const [infoEmbed, setInfoEmbed] = useState<Embed>();
+
 	useEffect(() => {
-		(async () => {
-			if (!router.isReady) return;
+		const initializeEmbed = async () => {
+		const protocol = window.location.protocol;
+		const host = window.location.host;
+		const newRootUrl = `${protocol}//${host}`;
+		setRootUrl(newRootUrl);
 
-			const { data, id } = router.query;
+		const embedTemplate: Embed = {
+			author: {
+			name: "Mr. Fox",
+			url: "https://en.wikipedia.org/wiki/Fox",
+			iconUrl: `${newRootUrl}/img/fox1.jpg`
+			},
+			title: "Foxes are cool!",
+			url: "https://en.wikipedia.org/wiki/Fox",
+			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
+			color: "#ff0000",
+			fields: [
+			{
+				name: "Field #1",
+				value: "Content of Field #1",
+				inline: true
+			},
+			{
+				name: "Field #2",
+				value: "Content of Field #2",
+				inline: true
+			}
+			],
+			image: `${newRootUrl}/img/fox2.jpg`,
+			thumbnail: `${newRootUrl}/img/fox.jpg`,
+			footer: {
+			text: "Yes, this is all about foxes!",
+			iconUrl: `${newRootUrl}/img/fox_emoji.png`,
+			},
+			timestamp: moment().unix()
+		};
+		setInfoEmbed(embedTemplate);
+		};
 
-			if (!data && !id) {
-				if (!embedLoaded) loadEmbed(infoEmbed);
+		initializeEmbed();
+	}, []);
+
+	useEffect(() => {
+		const loadEmbedData = async () => {
+			if (!router.isReady || !infoEmbed) return;
+
+			const { data } = router.query;
+
+			if (!data) {
+				if (!embedLoaded) {
+				loadEmbed(infoEmbed);
+				setEmbedLoaded(true);
+				}
 				return;
 			}
 
 			try {
 				let embed: any;
 
-				if (id) {
-					embed = await fetch(`/api/load?id=${id}`)
-						.then(res => res.json())
-						.then(res => res.embed);
+				const embedString = Array.isArray(data) ? data[0] : data;
 
-					if (!embed) {
-						throw new Error("No embed found.");
-					}
-				} else if (data) {
-					const embedString = Array.isArray(data) ? data[0] : data;
-
-					embed = JSON.parse(atob(embedString));
-				}
+				embed = JSON.parse(atob(embedString));
 
 				loadEmbed(embed);
 			} catch (e) {
@@ -154,26 +135,89 @@ export default function Home() {
 			} finally {
 				router.push("/", "/", { shallow: true });
 			}
-		})();
-	}, [router]);
+		};
+
+		loadEmbedData();
+	}, [router.isReady, infoEmbed, router, embedLoaded]);
 
 	useEffect(() => {
-		if (
+		const totalCharacters =
 			title.length +
-				description.length +
-				fields.reduce(
-					(acc, cur) => acc + cur.name.length + cur.value.length,
-					0
-				) +
-				footerText.length +
-				authorName.length >
-			6000
-		) {
-			setError(
-				"The total number of characters in the embed content must not exceed 6000!"
-			);
+			description.length +
+			fields.reduce((acc, cur) => acc + cur.name.length + cur.value.length, 0) +
+			footerText.length +
+			authorName.length;
+
+		if (totalCharacters > 6000) {
+			setError("The total number of characters in the embed content must not exceed 6000!");
+		} else {
+			setError(""); // Clear the error if no issues
 		}
 	}, [title, description, fields, footerText, authorName]);
+
+	useEffect(() => {
+		if (!variableFormat.includes("@")) {
+			setError("Placeholder format must contain @");
+			return;
+		}
+		if (variableFormat.startsWith("@")) {
+			setError("Placeholder format can't start with @");
+			return;
+		}
+		if (variableFormat.endsWith("@")) {
+			setError("Placeholder format can't end with' @");
+			return;
+		}
+
+		let count = 0;
+		for (let i = 0; i < variableFormat.length; i++) {
+			if (variableFormat.charAt(i) === "@") {
+				count++;
+			}
+		}
+		if (count > 1) {
+			setError("Placeholder format can only contain one @");
+			return;
+		}
+
+		setError("");
+
+	}, [variableFormat]);
+
+	useEffect(() => {
+		const nameCount: { [key: string]: number } = {};
+		let hasDuplicates = false;
+
+		// Count occurrences of each name
+		for (const entry of variables) {
+			if (nameCount[entry.name]) {
+				nameCount[entry.name]++;
+			} else {
+				nameCount[entry.name] = 1;
+			}
+		}
+
+		// Check for duplicates
+		for (const name in nameCount) {
+			if (nameCount[name] > 1) {
+				hasDuplicates = true;
+				break;
+			}
+		}
+
+		// Set error if duplicates are found
+		if (hasDuplicates) {
+			setError("Duplicate placeholder names found!");
+		} else if (variables[0] != undefined && variables[0].name.length > 10) {
+			setError("Placeholder error!");
+		} else {
+			setError(""); // Clear the error if no issues
+		}
+	}, [variables]);
+
+	function getRandom(min: number, max: number): number {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
 
 	function loadEmbed(embed: Embed) {
 		setAuthorIcon(embed.author?.iconUrl ?? "");
@@ -199,6 +243,53 @@ export default function Home() {
 
 		setEmbedLoaded(true);
 	}
+
+	function replaceVar(entry: string, variable: Variable) : string {
+		var format = variableFormat.replace("@",variable.name);
+		return entry.replace(format, variable.value);
+	}
+
+	function replaceVars(entry: string) : string {
+		var newEntry = structuredClone(entry);
+		for(const variable of variables) {
+			newEntry = replaceVar(newEntry, variable);
+		}
+		return newEntry;
+	}
+
+	function repalceVars(embed: Embed) : Embed {
+		const newEmbed = structuredClone(embed);
+
+		for(const entry of variables) {
+
+			newEmbed.author.name = replaceVar(newEmbed.author.name, entry);
+			newEmbed.author.iconUrl = replaceVar(newEmbed.author.iconUrl, entry);
+			newEmbed.author.url = replaceVar(newEmbed.author.url, entry);
+
+			newEmbed.title = replaceVar(newEmbed.title, entry);
+			newEmbed.url = replaceVar(newEmbed.url, entry);
+			newEmbed.description = replaceVar(newEmbed.description, entry);
+
+			for (var field of newEmbed.fields) {
+				field.name = replaceVar(field.name, entry);
+				field.value = replaceVar(field.value, entry);
+			}
+
+			newEmbed.image = replaceVar(newEmbed.image, entry);
+			newEmbed.thumbnail = replaceVar(newEmbed.thumbnail, entry);
+
+			newEmbed.footer.text = replaceVar(newEmbed.footer.text, entry);
+			newEmbed.footer.iconUrl = replaceVar(newEmbed.footer.iconUrl, entry);
+
+		}
+		return newEmbed;
+	}
+
+	function formatTimestamp() : string { // value="2024-07-02T10:00"
+		var time : number = timestamp !== undefined ? timestamp : moment().unix();
+
+        return moment.unix(time).format("YYYY-MM-DDTHH:mm");
+    }
 
 	const embed: Embed = {
 		author: {
@@ -230,16 +321,8 @@ export default function Home() {
 				<div>
 					<div className="flex justify-between items-baseline">
 						<h1 className="text-white font-semibold text-2xl">
-							Discord Embed Creator
+							Discord Embed Generator
 						</h1>
-						<a
-							href="https://github.com/cubedhuang/discord-embed-creator"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="hover:underline"
-						>
-							GitHub
-						</a>
 					</div>
 
 					<div className="flex mt-2 gap-2">
@@ -254,6 +337,7 @@ export default function Home() {
 								setUrl("");
 								setDescription("");
 								setFields([]);
+								setVariables([]);
 								setImage("");
 								setThumbnail("");
 								setColorEnabled(false);
@@ -282,13 +366,6 @@ export default function Home() {
 							Collapse All
 						</button>
 
-						<button
-							type="button"
-							onClick={() => setModal(true)}
-							className={button()}
-						>
-							Share Your Embed
-						</button>
 					</div>
 				</div>
 
@@ -298,13 +375,106 @@ export default function Home() {
 					</div>
 				) : null}
 
+				<details open className="variables">
+					<summary>
+							<h2>Placeholders &ndash; {variables.length}</h2>
+					</summary>
+					<div className="variable-info">
+						<h2 className="variable-info-title">What are placeholders?</h2>
+						<p className="variable-info-text">Placeholders are meant to be used as the name suggests, as a placeholder for different things. For example, you can have a placeholder &#123;name&#125; that has the value &#34;fox&#34;. Then you can use the placeholder &#123;name&#125; in descriptions, etc. You will see how it looks in the embed, but the final embed code has the placeholder, and then you can parse it in the final program where this JSON is being used.</p>
+					</div>
+					<div className="variable-info">
+						<h2 className="variable-info-title">Placeholder Format:</h2>
+						<p className="variable-info-text">This is the format how variables are formated in code and how they should be used</p>
+						<p className="variable-info-text">@ = Varaible name, will be repalced in final formating</p>
+						<LimitedInput
+							limit={10}
+							required={true}
+							type="text"
+							id={`variable-format`}
+							value={variableFormat}
+							onChange={e => {
+								setVariableFormat(e.target.value.toLowerCase());
+							}}
+						/>
+					</div>
+					{variables.map((varaible, index) => (
+						<details key={index}>
+							<p>{varaible.name.length > 0 ? "Usage: " +variableFormat.replace("@",varaible.name) : ""}</p>
+							<summary>
+								<h3 className="text-white font-semibold mr-auto">
+									Palceholder: {varaible.name}
+								</h3>
+								<button
+									onClick={() => {
+										setVariables(
+											variables.filter((_, i) => i !== index)
+										);
+									}}
+									className={button("red")}
+								>
+									Delete
+								</button>
+							</summary>
+							<div>
+								<label htmlFor={`variable-name-${index}`}>
+									Name
+								</label>
+								<LimitedInput
+									limit={10}
+									required={true}
+									type="text"
+									id={`variable-name-${index}`}
+									value={varaible.name}
+									onChange={e => {
+										const newVar = [...variables];
+										newVar[index].name = e.target.value.toLowerCase();
+										setVariables(newVar);
+									}}
+								/>
+							</div>
+							<div>
+								<label htmlFor={`variable-value-${index}`}>
+									Value
+								</label>
+								<LimitedInput
+									limit={1024}
+									required={true}
+									type="text"
+									id={`variable-value-${index}`}
+									value={varaible.value}
+									onChange={e => {
+										const newVar = [...variables];
+										newVar[index].value = e.target.value;
+										setVariables(newVar);
+									}}
+								/>
+							</div>
+						</details>
+					))}
+					<button
+						type="button"
+						onClick={() => {
+							if (variables.length < 25)
+								setVariables([
+									...variables,
+									{
+										name: "ph-" + getRandom(1000,9000),
+										value: "Foxes are cute!"
+									}
+								]);
+						}}
+						className={`mt-4 ${button(
+							variables.length < 25 ? "blue" : "disabled"
+						)}`}
+					>
+						Add Palceholder
+					</button>
+				</details>
 				<details open>
 					<summary>
 						<h2>
 							Author
-							{authorName ? (
-								<> &ndash; {ellipses(authorName)}</>
-							) : null}
 						</h2>
 					</summary>
 					<ValueInput
@@ -325,7 +495,6 @@ export default function Home() {
 					<summary>
 						<h2>
 							Body
-							{title ? <> &ndash; {ellipses(title)}</> : null}
 						</h2>
 					</summary>
 					<ValueInput
@@ -374,8 +543,7 @@ export default function Home() {
 						<details key={index}>
 							<summary>
 								<h3 className="text-white font-semibold mr-auto">
-									Field {index + 1} &ndash;{" "}
-									{ellipses(field.name)}
+									{ellipses(replaceVars(field.name))}
 								</h3>
 								<button
 									onClick={() => {
@@ -391,10 +559,10 @@ export default function Home() {
 										setFields(newFields);
 									}}
 									className={button(
-										index === 0 ? "disabled" : "blue"
+										"blue"
 									)}
 								>
-									Move Up
+									UP
 								</button>
 								<button
 									onClick={() => {
@@ -410,12 +578,10 @@ export default function Home() {
 										setFields(newFields);
 									}}
 									className={button(
-										index === fields.length - 1
-											? "disabled"
-											: "blue"
+										"blue"
 									)}
 								>
-									Move Down
+									Down
 								</button>
 								<button
 									onClick={() => {
@@ -515,9 +681,6 @@ export default function Home() {
 					<summary>
 						<h2>
 							Footer
-							{footerText ? (
-								<> &ndash; {ellipses(footerText)}</>
-							) : null}
 						</h2>
 					</summary>
 					<ValueInput
@@ -529,93 +692,29 @@ export default function Home() {
 						label="Footer Icon URL"
 						value={[footerIcon, setFooterIcon]}
 					/>
-					<div className="flex items-center gap-2">
-						<label htmlFor="timestamp">Timestamp?</label>
-						<input
-							type="checkbox"
-							id="timestamp"
-							checked={!!timestamp}
-							onChange={e =>
-								setTimestamp(
-									e.target.checked ? Date.now() : undefined
-								)
-							}
-							className="mt-2"
-						/>
-					</div>
+					<label>
+						Timestamp
+					</label>
+					<LimitedInput
+						limit={100}
+						required={true}
+						type="datetime-local"
+						min="1971-01-01"
+						max="2100-01-01"
+						value={formatTimestamp()}
+						onChange={e => {
+							setTimestamp(moment(e.target.value).unix());
+						}}
+					/>
 				</details>
 			</div>
 
 			<div className="flex-1 bg-[#36393f] p-8">
-				<DiscordEmbed embed={embed} />
+
+				<DiscordEmbed embed={repalceVars(embed)} />
 
 				<Output embed={embed} />
 			</div>
-
-			{modal ? (
-				<>
-					<div
-						className="fixed top-0 left-0 right-0 bottom-0 bg-black opacity-50"
-						onClick={() => setModal(false)}
-					/>
-
-					<div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#292b2f] p-4 rounded">
-						<h2 className="text-white text-xl font-semibold">
-							Share Your Embed
-						</h2>
-
-						<p className="mb-2">
-							Click the button below to copy a link to share your
-							embed.
-						</p>
-
-						<p className="mb-1">
-							The short link will be valid for one week.
-						</p>
-
-						<Copier
-							getContent={async () => {
-								const { id } = await fetch("/api/save", {
-									body: JSON.stringify({
-										embed: embedToPartial(embed)
-									}),
-									method: "POST",
-									headers: {
-										"Content-Type": "application/json"
-									}
-								}).then(res => res.json());
-
-								return `${location.origin}/?id=${id}`;
-							}}
-							idleClassName={button()}
-							loadingClassName={`${button(
-								"disabled"
-							)} animate-pulse`}
-							copiedClassName={button("disabled")}
-							errorClassName={button("disabled")}
-							timeout={30000}
-						>
-							Copy Short Link
-						</Copier>
-
-						<p className="mt-2 mb-1">
-							The permanent link contains all of your embed data.
-						</p>
-
-						<Copier
-							getContent={() =>
-								`${location.origin}/?data=${encodeURIComponent(
-									btoa(JSON.stringify(embedToPartial(embed)))
-								)}`
-							}
-							idleClassName={button()}
-							copiedClassName={button("disabled")}
-						>
-							Copy Permanent Link
-						</Copier>
-					</div>
-				</>
-			) : null}
 		</div>
 	);
 }

@@ -1,5 +1,7 @@
 import type { Embed, EmbedField } from "../lib/interfaces";
 import Markdown from "../lib/markdown/Markdown";
+import moment from 'moment';
+import { timeStamp } from 'console';
 
 export default function DiscordEmbed({ embed }: { embed: Embed }) {
 	const fieldRows: EmbedField[][] = [];
@@ -30,6 +32,11 @@ export default function DiscordEmbed({ embed }: { embed: Embed }) {
 		for (let i = 1; i < 13; i += step) {
 			fieldGridCols.push(`${i}/${i + step}`);
 		}
+	}
+
+	function formatTimestamp() : string {
+		var unix : number = embed.timestamp !== undefined ? embed.timestamp : moment().unix();
+		return moment(unix * 1000).calendar();
 	}
 
 	return (
@@ -166,7 +173,7 @@ export default function DiscordEmbed({ embed }: { embed: Embed }) {
 									&bull;
 								</span>
 							) : null}
-							{embed.timestamp ? "Today at 12:00 PM" : null}
+							{formatTimestamp()}
 						</div>
 					</div>
 				) : null}

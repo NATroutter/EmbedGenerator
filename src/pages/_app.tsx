@@ -4,9 +4,9 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-	const title = "Discord Embed Creator";
+	const title = "Discord Embed Generator";
 	const description =
-		"A tool to build Discord embeds for discord.js and discord.py.";
+		"A tool to build Discord embeds as json to be used in different projects";
 
 	return (
 		<>

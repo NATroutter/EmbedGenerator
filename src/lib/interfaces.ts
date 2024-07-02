@@ -84,3 +84,8 @@ export interface EmbedField {
 	 */
 	inline: boolean;
 }
+
+export interface Variable {
+	name: string;
+	value: string;
+}

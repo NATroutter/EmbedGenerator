@@ -3,13 +3,12 @@ export default function LimitedInput({
 	textarea = false,
 	required = false,
 	...props
-}: React.DetailedHTMLProps<
-	React.InputHTMLAttributes<HTMLInputElement>,
-	HTMLInputElement
-> & { limit: number; textarea?: boolean; required?: boolean }) {
-	const Element: keyof JSX.IntrinsicElements = textarea
-		? "textarea"
-		: "input";
+}: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> & {
+	limit: number;
+	textarea?: boolean;
+	required?: boolean
+}) {
+	const Element: keyof JSX.IntrinsicElements = textarea ? "textarea" : "input";
 
 	return (
 		<div className="limited-input relative">
