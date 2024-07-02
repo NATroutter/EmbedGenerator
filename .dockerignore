@@ -1,0 +1,10 @@
+Dockerfile
+docker-compose.yml
+build.sh
+run.sh
+/docker
+/materials
+EmbedGenerator.code-workspace
+README.md
+/.git
+.gitignore
