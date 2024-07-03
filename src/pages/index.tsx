@@ -7,6 +7,8 @@ import Output from "../components/Output";
 import ValueInput from "../components/ValueInput";
 import { Embed, EmbedField, Variable } from '../lib/interfaces';
 import moment from 'moment';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { embedToObjectCode } from '../lib/utils';
 
 function ellipses(str: string, max = 50) {
 	return str.length > max ? `${str.slice(0, max - 3)}...` : str;
@@ -29,6 +31,7 @@ function setAllDetails(open: boolean) {
 		details.open = open;
 	}
 }
+
 
 const defaultVariables : Variable[] = [
 	{
@@ -428,6 +431,13 @@ export default function Home() {
 		timestamp
 	};
 
+	const [copied, setCopied] = useState(false);
+
+	const handleCopy = () => {
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
+	};
+
 	return (
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
@@ -484,7 +494,9 @@ export default function Home() {
 						>
 							Import
 						</button>
-
+						<CopyToClipboard text={embedToObjectCode(embed,variables,false)} onCopy={handleCopy}>
+							<button type="button" className={button()}>{copied ? 'Copied!' : 'Copy'}</button>
+						</CopyToClipboard>
 					</div>
 				</div>
 

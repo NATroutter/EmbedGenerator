@@ -84,40 +84,6 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@redis/bloom@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/@redis/bloom/-/bloom-1.0.2.tgz"
-  integrity sha512-EBw7Ag1hPgFzdznK2PBblc1kdlj5B5Cw3XwI9/oG7tSn85/HKy3X9xHy/8tm/eNXJYHLXHJL/pkwBpFMVVefkw==
-
-"@redis/client@^1.0.0", "@redis/client@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@redis/client/-/client-1.1.0.tgz"
-  integrity sha512-xO9JDIgzsZYDl3EvFhl6LC52DP3q3GCMUer8zHgKV6qSYsq1zB+pZs9+T80VgcRogrlRYhi4ZlfX6A+bHiBAgA==
-  dependencies:
-    cluster-key-slot "1.1.0"
-    generic-pool "3.8.2"
-    yallist "4.0.0"
-
-"@redis/graph@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/@redis/graph/-/graph-1.0.1.tgz"
-  integrity sha512-oDE4myMCJOCVKYMygEMWuriBgqlS5FqdWerikMoJxzmmTUErnTRRgmIDa2VcgytACZMFqpAOWDzops4DOlnkfQ==
-
-"@redis/json@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@redis/json/-/json-1.0.3.tgz"
-  integrity sha512-4X0Qv0BzD9Zlb0edkUoau5c1bInWSICqXAGrpwEltkncUwcxJIGEcVryZhLgb0p/3PkKaLIWkjhHRtLe9yiA7Q==
-
-"@redis/search@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.npmjs.org/@redis/search/-/search-1.0.6.tgz"
-  integrity sha512-pP+ZQRis5P21SD6fjyCeLcQdps+LuTzp2wdUbzxEmNhleighDDTD5ck8+cYof+WLec4csZX7ks+BuoMw0RaZrA==
-
-"@redis/time-series@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/@redis/time-series/-/time-series-1.0.3.tgz"
-  integrity sha512-OFp0q4SGrTH0Mruf6oFsHGea58u8vS/iI5+NpYdicaM+7BgqBZH8FFvNZ8rYYLrUO/QRqMq72NpXmxLVNcdmjA==
-
 "@rushstack/eslint-patch@^1.1.3":
   version "1.1.3"
   resolved "https://registry.npmjs.org/@rushstack/eslint-patch/-/eslint-patch-1.1.3.tgz"
@@ -135,11 +101,6 @@
   dependencies:
     "@swc/counter" "^0.1.3"
     tslib "^2.4.0"
-
-"@types/file-saver@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.npmjs.org/@types/file-saver/-/file-saver-2.0.7.tgz"
-  integrity sha512-dNKVfHd/jk0SkR/exKGj2ggkB45MAkzvWCaqLUUgkyjITkGNzH8H+yUwr+BLJUBjZOe9w8X3wgmXhZDRg1ED6A==
 
 "@types/hast@^2.0.0":
   version "2.3.4"
@@ -167,6 +128,13 @@
   version "2.1.0"
   resolved "https://registry.npmjs.org/@types/punycode/-/punycode-2.1.0.tgz"
   integrity sha512-PG5aLpW6PJOeV2fHRslP4IOMWn+G+Uq8CfnyJ+PDS8ndCbU+soO+fB3NKCKo0p/Jh2Y4aPaiQZsrOXFdzpcA6g==
+
+"@types/react-copy-to-clipboard@^5.0.7":
+  version "5.0.7"
+  resolved "https://registry.npmjs.org/@types/react-copy-to-clipboard/-/react-copy-to-clipboard-5.0.7.tgz"
+  integrity sha512-Gft19D+as4M+9Whq1oglhmK49vqPhcLzk8WfvfLvaYMIPYanyfLy0+CwFucMJfdKoSFyySPmkkWn8/E6voQXjQ==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react-dom@18.0.5":
   version "18.0.5"
@@ -493,11 +461,6 @@ client-only@0.0.1:
   resolved "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz"
   integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
 
-cluster-key-slot@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz"
-  integrity sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==
-
 color-convert@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz"
@@ -519,6 +482,13 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
+
+copy-to-clipboard@^3.3.1:
+  version "3.3.3"
+  resolved "https://registry.npmjs.org/copy-to-clipboard/-/copy-to-clipboard-3.3.3.tgz"
+  integrity sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==
+  dependencies:
+    toggle-selection "^1.0.6"
 
 core-js-pure@^3.20.2:
   version "3.23.3"
@@ -944,11 +914,6 @@ file-entry-cache@^6.0.1:
   dependencies:
     flat-cache "^3.0.4"
 
-file-saver@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.npmjs.org/file-saver/-/file-saver-2.0.5.tgz"
-  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
-
 fill-range@^7.1.1:
   version "7.1.1"
   resolved "https://registry.npmjs.org/fill-range/-/fill-range-7.1.1.tgz"
@@ -1015,11 +980,6 @@ functions-have-names@^1.2.2:
   version "1.2.3"
   resolved "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz"
   integrity sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==
-
-generic-pool@3.8.2:
-  version "3.8.2"
-  resolved "https://registry.npmjs.org/generic-pool/-/generic-pool-3.8.2.tgz"
-  integrity sha512-nGToKy6p3PAbYQ7p1UlWl6vSPwfwU6TMSWK7TTu+WUY4ZjyZQGniGGt2oNVvyNSpyZYSB43zMXVLcBm08MTMkg==
 
 get-intrinsic@^1.0.2, get-intrinsic@^1.1.0, get-intrinsic@^1.1.1:
   version "1.1.2"
@@ -1782,6 +1742,14 @@ quick-lru@^5.1.1:
   resolved "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
+react-copy-to-clipboard@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.npmjs.org/react-copy-to-clipboard/-/react-copy-to-clipboard-5.1.0.tgz"
+  integrity sha512-k61RsNgAayIJNoy9yDsYzDe/yAZAzEbEgcz3DZMhF686LEyukcE1hzurxe85JandPUG+yTfGVFzuEw3xt8WP/A==
+  dependencies:
+    copy-to-clipboard "^3.3.1"
+    prop-types "^15.8.1"
+
 react-dom@^18.2.0, react-dom@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
@@ -1806,7 +1774,7 @@ react-syntax-highlighter@^15.5.0:
     prismjs "^1.27.0"
     refractor "^3.6.0"
 
-react@^18.2.0, "react@>= 0.14.0", "react@>= 16.8.0 || 17.x.x || ^18.0.0-0", react@18.2.0:
+"react@^15.3.0 || 16 || 17 || 18", react@^18.2.0, "react@>= 0.14.0", "react@>= 16.8.0 || 17.x.x || ^18.0.0-0", react@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
@@ -1826,18 +1794,6 @@ readdirp@~3.6.0:
   integrity sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==
   dependencies:
     picomatch "^2.2.1"
-
-redis@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.npmjs.org/redis/-/redis-4.1.0.tgz"
-  integrity sha512-5hvJ8wbzpCCiuN1ges6tx2SAh2XXCY0ayresBmu40/SGusWHFW86TAlIPpbimMX2DFHOX7RN34G2XlPA1Z43zg==
-  dependencies:
-    "@redis/bloom" "1.0.2"
-    "@redis/client" "1.1.0"
-    "@redis/graph" "1.0.1"
-    "@redis/json" "1.0.3"
-    "@redis/search" "1.0.6"
-    "@redis/time-series" "1.0.3"
 
 refractor@^3.6.0:
   version "3.6.0"
@@ -2091,6 +2047,11 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
+toggle-selection@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.npmjs.org/toggle-selection/-/toggle-selection-1.0.6.tgz"
+  integrity sha512-BiZS+C1OS8g/q2RRbJmy59xpyghNBqrr6k5L/uKBGRsTfxmu3ffiRnd8mlGPUVayg8pvfi5urfnu8TU7DVOkLQ==
+
 tsconfig-paths@^3.14.1:
   version "3.14.1"
   resolved "https://registry.npmjs.org/tsconfig-paths/-/tsconfig-paths-3.14.1.tgz"
@@ -2202,11 +2163,6 @@ xtend@^4.0.0, xtend@^4.0.2:
   version "4.0.2"
   resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
-
-yallist@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz"
-  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yaml@^1.10.2:
   version "1.10.2"
