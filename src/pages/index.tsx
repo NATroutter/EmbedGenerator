@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
-import DiscordEmbed from "../components/DiscordEmbed";
 import LimitedInput from "../components/LimitedInput";
 import Output from "../components/Output";
 import ValueInput from "../components/ValueInput";
@@ -9,6 +8,7 @@ import { Embed, EmbedField, Variable } from '../lib/interfaces';
 import moment from 'moment';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { embedToObjectCode } from '../lib/utils';
+import EmbedBase from "../components/EmbedBase";
 
 function ellipses(str: string, max = 50) {
 	return str.length > max ? `${str.slice(0, max - 3)}...` : str;
@@ -60,6 +60,7 @@ export default function Home() {
 	const [footerText, setFooterText] = useState("");
 	const [footerIcon, setFooterIcon] = useState("");
 	const [timestamp, setTimestamp] = useState<number | undefined>(undefined);
+	const [useCurrentTime, setUseCurrentTime] = useState<boolean>(false);
 
 	const [embedLoaded, setEmbedLoaded] = useState(false);
 	const [variablesLoaded, setVariablesLoaded] = useState(false);
@@ -73,47 +74,6 @@ export default function Home() {
 
 	useEffect(() => {
 		const initializeEmbed = async () => {
-			const protocol = window.location.protocol;
-			const host = window.location.host;
-			const newRootUrl = `${protocol}//${host}`;
-
-			const embedTemplate: Embed = {
-				author: {
-				name: "Mr. Fox",
-				url: "https://en.wikipedia.org/wiki/Fox",
-				iconUrl: `${newRootUrl}/assets/img/foxes/fox1.jpg`
-				},
-				title: "Foxes are cool!",
-				url: "https://en.wikipedia.org/wiki/Fox",
-				description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
-				color: "#ff0000",
-				fields: [
-					{
-						name: "Field #1",
-						value: "Content of Field #1",
-						inline: true
-					},
-					{
-						name: "Field #2",
-						value: "Content of Field #2",
-						inline: true
-					}
-				],
-				image: `${newRootUrl}/assets/img/foxes/fox2.jpg`,
-				thumbnail: `${newRootUrl}/assets/img/foxes/fox.jpg`,
-				footer: {
-				text: "Yes, this is all about foxes!",
-				iconUrl: `${newRootUrl}/assets/img/foxes/fox_emoji.png`,
-				},
-				timestamp: moment().unix()
-			};
-			setInfoEmbed(embedTemplate);
-		};
-		initializeEmbed();
-	}, []);
-
-	useEffect(() => {
-		const initializeEmbed = async () => {
 		const protocol = window.location.protocol;
 		const host = window.location.host;
 		const newRootUrl = `${protocol}//${host}`;
@@ -124,20 +84,22 @@ export default function Home() {
 			url: "https://en.wikipedia.org/wiki/Fox",
 			iconUrl: `${newRootUrl}/assets/img/foxes/fox1.jpg`
 			},
-			title: "Foxes are cool!",
-			url: "https://en.wikipedia.org/wiki/Fox",
-			description: "Foxes are small-to-medium-sized omnivorous mammals belonging to several genera of the family Canidae. They have a flattened skull; upright, triangular ears; a pointed, slightly upturned snout; and a long, bushy tail (\"brush\").\n[Read more about foxes](https://en.wikipedia.org/wiki/Fox)\n\n**Using placeholders:**\nPH1: {ph1}\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\nSimple Code Block\n```",
+			title: "Vulpine Charm: The Unrivaled Cuteness of Foxes",
+			url: `${newRootUrl}/fox`,
+			description: "Russet fur and twinkling eyes, A bushy tail, such a prize. Pointy ears and button nose, The fox's charm forever grows.\n\nPlayful pounce and sly grin, Their cuteness makes our hearts give in. No creature matches their allure, The fox's adorable nature pure.\n\nIn forests, fields, or urban space, They captivate with vulpine grace. Of all Earth's creatures, great and small, The fox stands cutest of them all.\n\n**Using placeholders:**\nPH1: {ph1}\n\n**Using mentions:**\n<@123>, <@!123>, <#123>, <@&123>, @here, @everyone \n```\npublic class Program extends FoxLib {\n    public static void main(String[] args) {\n        printLn(\"Foxes are super cute!\");\n    }\n}\n```",
 			color: "#ff0000",
 			fields: [
 			{
 				name: "Field #1",
 				value: "Content of Field #1",
-				inline: true
+				inline: true,
+				blank: false
 			},
 			{
 				name: "Field #2",
 				value: "Content of Field #2",
-				inline: true
+				inline: true,
+				blank: false
 			}
 			],
 			image: `${newRootUrl}/assets/img/foxes/fox2.jpg`,
@@ -146,7 +108,8 @@ export default function Home() {
 			text: "Yes, this is all about foxes!",
 			iconUrl: `${newRootUrl}/assets/img/foxes/fox_emoji.png`,
 			},
-			timestamp: moment().unix()
+			timestamp: moment().unix(),
+			useCurrentTime: false
 		};
 		setInfoEmbed(embedTemplate);
 		};
@@ -296,7 +259,9 @@ export default function Home() {
 			setFields(embed.fields
 			.map((e:EmbedField) => ({
 				name: e.name?.trim() ?? undefined,
-				value: e.value?.trim() ?? undefined
+				value: e.value?.trim() ?? undefined,
+				inline: e.inline ?? false,
+				blank: e.blank ?? false
 			})).filter((e:EmbedField) => e.name !== undefined && e.value !== undefined));
 		} else {
 			setFields([])
@@ -312,6 +277,7 @@ export default function Home() {
 		setFooterIcon(embed?.footer?.iconUrl ?? "");
 
 		setTimestamp(embed?.timestamp);
+		setUseCurrentTime(embed?.useCurrentTime)
 
 		if (isValid(vars)) {
 			setVariables(vars
@@ -353,6 +319,7 @@ export default function Home() {
 		setFooterIcon(embed.footer?.iconUrl ?? "");
 
 		setTimestamp(embed.timestamp);
+		setUseCurrentTime(embed.useCurrentTime)
 
 		setEmbedLoaded(true);
 	}
@@ -419,7 +386,8 @@ export default function Home() {
 		fields: fields.map(field => ({
 			name: field.name.trim(),
 			value: field.value.trim(),
-			inline: field.inline
+			inline: field.inline,
+			blank: field.blank
 		})),
 		image: image.trim(),
 		thumbnail: thumbnail.trim(),
@@ -428,7 +396,8 @@ export default function Home() {
 			text: footerText.trim(),
 			iconUrl: footerIcon.trim()
 		},
-		timestamp
+		timestamp: timestamp,
+		useCurrentTime: useCurrentTime
 	};
 
 	const [copied, setCopied] = useState(false);
@@ -464,6 +433,7 @@ export default function Home() {
 								setFooterText("");
 								setFooterIcon("");
 								setTimestamp(undefined);
+								setUseCurrentTime(false)
 								setError(undefined);
 							}}
 							className={button("red")}
@@ -769,8 +739,20 @@ export default function Home() {
 									checked={field.inline}
 									onChange={e => {
 										const newFields = [...fields];
-										newFields[index].inline =
-											e.target.checked;
+										newFields[index].inline = e.target.checked;
+										setFields(newFields);
+									}}
+									className="mt-2"
+								/>
+								<label htmlFor={`field-inline-${index}`}>
+									Blank
+								</label>
+								<input
+									type="checkbox"
+									checked={field.blank}
+									onChange={e => {
+										const newFields = [...fields];
+										newFields[index].blank = e.target.checked;
 										setFields(newFields);
 									}}
 									className="mt-2"
@@ -787,7 +769,8 @@ export default function Home() {
 									{
 										name: "A New Field",
 										value: "",
-										inline: false
+										inline: false,
+										blank: false
 									}
 								]);
 						}}
@@ -837,12 +820,25 @@ export default function Home() {
 							setTimestamp(moment(e.target.value).unix());
 						}}
 					/>
+					<div className="flex items-center gap-2">
+						<label htmlFor="color-enabled" className="text-sm text-white ml-2">
+							Always Current Time?
+						</label>
+						<input
+							type="checkbox"
+							checked={useCurrentTime}
+							id = "use-current-time"
+							value={color}
+							onChange={e => setUseCurrentTime(!useCurrentTime)}
+							className="mt-2"
+						/>
+					</div>
 				</details>
 			</div>
 
 			<div className="flex-1 bg-[#36393f] p-8">
 
-				<DiscordEmbed embed={repalceVars(embed)} errors={error} />
+				<EmbedBase embed={repalceVars(embed)} errors={error} />
 
 				<Output embed={embed} variables={variables} errors={error} />
 			</div>

@@ -24,6 +24,9 @@ export interface Embed {
 	 * Embed timestamp in epoch time.
 	 */
 	timestamp?: number;
+
+	useCurrentTime: boolean
+
 	/**
 	 * Embed color.
 	 */
@@ -89,6 +92,7 @@ export interface EmbedField {
 	 * Embed field inline flag.
 	 */
 	inline: boolean;
+	blank: boolean;
 }
 
 export interface Variable {

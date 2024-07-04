@@ -31,8 +31,12 @@ function clearEmptySlots<T extends object>(
 	}
 
 	return Object.entries(obj).reduce((acc, [key, value]) => {
-		if (objectCode)
-			key = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+
+		if (typeof value === "boolean") {
+			// @ts-expect-error
+			acc[key] = value;
+		}
+
 		if (typeof value === "object") {
 			const cleared = clearEmptySlots(value, objectCode);
 
@@ -42,11 +46,7 @@ function clearEmptySlots<T extends object>(
 			acc[key] = cleared;
 		} else if (value) {
 			// @ts-expect-error
-			acc[key] = objectCode
-				? key === "image" || key === "thumbnail"
-					? { url: value }
-					: value
-				: value;
+			acc[key] = objectCode ? ((key === "image" || key === "thumbnail") ? { url: value } : value) : value;
 		}
 		return acc;
 	}, {});
