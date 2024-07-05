@@ -13,6 +13,7 @@ import ExportButton from "../components/buttons/ExportButton";
 import ImportButton, { FileTypes } from "../components/buttons/ImportButton";
 import BasicButton from "../components/buttons/BasicButton";
 import CopyButton from "../components/buttons/CopyButton";
+import { Base64 } from "js-base64";
 
 function ellipses(str: string, max = 50) {
 	return str.length > max ? `${str.slice(0, max - 3)}...` : str;
@@ -380,11 +381,6 @@ export default function Home() {
 		useCurrentTime: useCurrentTime
 	};
 
-	interface Penis {
-		test1: string,
-		test2: string
-	}
-
 	return (
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
@@ -437,15 +433,15 @@ export default function Home() {
 							FileTypes.TXT
 						]} onError={(err)=>setError(err)} onLoad={(data)=>{
 							try {
-								loadJson(JSON.parse(atob(data)));
+								loadJson(JSON.parse(Base64.decode(data)));
 							} catch {
 								setError("Invalid Base64!")
 							}
 						}} />
 
-						<ExportButton text="Export (Baase64)" fileName="Embed" fileExt="txt" content={btoa(embedToObjectCode(embed,placeholders,false))}/>
+						<ExportButton text="Export (Base64)" fileName="Embed" fileExt="txt" content={Base64.encode(embedToObjectCode(embed,placeholders,false))}/>
 
-						<CopyButton content={btoa(embedToObjectCode(embed,placeholders,false))}>Copy (Base64)</CopyButton>
+						<CopyButton content={Base64.encode(embedToObjectCode(embed,placeholders,false))}>Copy (Base64)</CopyButton>
 					</div>
 				</div>
 

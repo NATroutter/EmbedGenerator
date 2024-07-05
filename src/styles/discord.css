@@ -653,13 +653,13 @@
 	vertical-align: bottom
 }
 
-.message-group.compact .message:not(.first) .timestamp {
-	/* color: transparent !important */
+/* .message-group.compact .message:not(.first) .timestamp {
+	color: transparent !important
 }
 
 .message-group.compact .message:hover .timestamp {
-	/* color: #99aab5 !important */
-}
+	color: #99aab5 !important
+} */
 
 .message-group.compact .message .message-text .markup {
 	text-indent: -100px;
