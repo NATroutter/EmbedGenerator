@@ -504,6 +504,19 @@
 .message-group .image {
 	vertical-align: bottom;
 	max-width: 396px
+	/* EMBED_SIZE */
+}
+
+.embed-wrapper {
+	position: relative;
+	margin-top: 5px;
+	max-width: 510px;
+	display: flex;
+		/* 510px 396px; EMBED_SIZES*/
+}
+
+.embed-wrapper-image {
+	max-width: 396px;
 }
 
 .message-group .avatar-large {
@@ -756,12 +769,6 @@
 	display: -ms-flexbox
 }
 
-.embed-wrapper {
-	position: relative;
-	margin-top: 5px;
-	max-width: 396px;
-	display: flex
-}
 
 .embed-wrapper .embed-color-pill {
 	width: 4px;
@@ -826,7 +833,7 @@
 	object-fit: contain;
 	-ms-flex-negative: 0;
 	flex-shrink: 0;
-	margin-left: 20px
+	margin-left: 0.75rem /* 20px */
 }
 
 .embed.embed-inline {

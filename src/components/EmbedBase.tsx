@@ -95,11 +95,11 @@ const EImage = ({ url } : { url:string }) => {
     return null;
   }
 
-  // NOTE: for some reason it's a link in the original DOM
-  // not sure if this breaks the styling, probably does
+ var style = "image"
+
   return (
-    <a className='embed-thumbnail embed-thumbnail-rich'>
-      <img className='image' role='presentation' src={url} alt="Embed Image" />
+    <a className="embed-thumbnail embed-thumbnail-rich">
+      <img className={style} role='presentation' src={url} alt="Embed Image" />
     </a>
   );
 };
@@ -133,7 +133,61 @@ const Fields = ({ fields } : {fields: EmbedField[]}) => {
     return null;
   }
 
-  return <div className='embed-fields'>{fields.map((f, i) => <Field key={i} {...f} />)}</div>;
+  const fieldRows: EmbedField[][] = [];
+  const fieldGridCols: string[] = [];
+
+  for (const field of fields) {
+    if (
+      // If there are no rows
+      fieldRows.length === 0 ||
+      // Or the current field is not inline
+      !field.inline ||
+      // Or the previous row's field is not inline
+      !fieldRows[fieldRows.length - 1][0].inline ||
+      // Or the previous row's number of fields is at least 3
+      fieldRows[fieldRows.length - 1].length >= 3
+    ) {
+      // Start a new row
+      fieldRows.push([field]);
+    } else {
+      // Otherwise, add the field to the last row
+      fieldRows[fieldRows.length - 1].push(field);
+    }
+  }
+
+  for (const row of fieldRows) {
+    const step = 12 / row.length;
+    for (let i = 1; i < 13; i += step) {
+      fieldGridCols.push(`${i}/${i + step}`);
+    }
+  }
+
+  //Fields
+  return (
+    <div className="min-w-0 grid col-[1/1] mt-2 gap-2">
+      {fields.map((field, index) => (
+        <div
+          key={index}
+          className="min-w-0 text-sm leading-[1.125rem] font-normal"
+          style={{ gridColumn: fieldGridCols[index] }}
+        >
+          {/* Field Name */}
+          <div className="min-w-0 text-white font-semibold mb-0.5">
+            <Markdown type="header">
+              {field.name}
+            </Markdown>
+          </div>
+
+          {/* Field Value */}
+          <div className="min-w-0 font-normal whitespace-pre-line">
+            <Markdown>{field.value}</Markdown>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  //return <div className='embed-fields'>{fields.map((f, i) => <Field key={i} {...f} />)}</div>;
 };
 
 export default function EmbedBase({ embed, errors } : { embed: Embed, errors: string | undefined}) {
@@ -144,6 +198,9 @@ export default function EmbedBase({ embed, errors } : { embed: Embed, errors: st
 		);
 	}
 
+
+  var wrapStyle = (embed.image.length > 0 ? "embed-wrapper-image " : "") + "embed-wrapper"
+
   return (
     <div className="flex-vertical whitney theme-dark">
       <div className="chat flex-vertical flex-spacer">
@@ -153,7 +210,7 @@ export default function EmbedBase({ embed, errors } : { embed: Embed, errors: st
               <div className="scroller messages">
                 <div className="message-group hide-overflow ">
                   <div className='accessory'>
-                    <div className='embed-wrapper'>
+                    <div className={wrapStyle}>
                       <ColorPill color={embed.color} />
                       <div className='embed embed-rich'>
                         <div className='embed-content'>

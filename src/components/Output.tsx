@@ -3,7 +3,6 @@ import { useState } from "react";
 import type { Embed } from "../lib/interfaces";
 import { embedToObjectCode } from "../lib/utils";
 import Highlight from "./Highlight";
-import { Variable } from '../lib/interfaces';
 
 function s(strings: TemplateStringsArray, ...values: unknown[]) {
 	let escaped = "";

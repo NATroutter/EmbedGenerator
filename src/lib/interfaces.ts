@@ -4,7 +4,7 @@
 
 export interface outputData {
 	embed: Embed
-	variables: Variable[]
+	placeholders: Placeholder[]
 }
 
 export interface Embed {
@@ -95,7 +95,7 @@ export interface EmbedField {
 	blank: boolean;
 }
 
-export interface Variable {
+export interface Placeholder {
 	name: string;
 	value: string;
 }

@@ -4,21 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import LimitedInput from "../components/LimitedInput";
 import Output from "../components/Output";
 import ValueInput from "../components/ValueInput";
-import { Embed, EmbedField, Variable } from '../lib/interfaces';
+import { Embed, EmbedField, Placeholder } from '../lib/interfaces';
 import moment from 'moment';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { embedToObjectCode } from '../lib/utils';
 import EmbedBase from "../components/EmbedBase";
+import DiscordEmbed from "../components/DiscordEmbed";
+import ExportButton from "../components/buttons/ExportButton";
+import ImportButton, { FileTypes } from "../components/buttons/ImportButton";
+import BasicButton from "../components/buttons/BasicButton";
+import CopyButton from "../components/buttons/CopyButton";
 
 function ellipses(str: string, max = 50) {
 	return str.length > max ? `${str.slice(0, max - 3)}...` : str;
 }
 
-function button(type: "blue" | "red" | "disabled" = "blue") {
-	return `font-medium py-1 px-2 rounded transition ${
-		type === "blue"
-			? "bg-[#d83c3e] hover:bg-[#a12d2f] text-white"
-			: type === "red"
+function button(type: "red" | "disabled" = "red") {
+	return `font-medium py-1 px-2 rounded transition ${type === "red"
 			? "bg-[#d83c3e] hover:bg-[#a12d2f] text-white"
 			: "bg-[#4f545c] cursor-not-allowed"
 	}`;
@@ -33,7 +34,7 @@ function setAllDetails(open: boolean) {
 }
 
 
-const defaultVariables : Variable[] = [
+const defaultVariables : Placeholder[] = [
 	{
 		name: "ph1",
 		value: "Foxes are so adorable <3"
@@ -52,7 +53,11 @@ export default function Home() {
 	const [colorEnabled, setColorEnabled] = useState(true);
 
 	const [fields, setFields] = useState<EmbedField[]>([]);
-	const [variables, setVariables] = useState<Variable[]>([]);
+	const [fieldIndex, setFieldIndex] = useState<number>(2);
+
+	const [placeholders, setPlaceholder] = useState<Placeholder[]>([]);
+	const [placeholdersLoaded, setPlaceholdersLoaded] = useState(false);
+	const [placeholderFormat, setVariableFormat] = useState<string>("{@}");
 
 	const [image, setImage] = useState("");
 	const [thumbnail, setThumbnail] = useState("");
@@ -63,14 +68,9 @@ export default function Home() {
 	const [useCurrentTime, setUseCurrentTime] = useState<boolean>(false);
 
 	const [embedLoaded, setEmbedLoaded] = useState(false);
-	const [variablesLoaded, setVariablesLoaded] = useState(false);
-	const [variableFormat, setVariableFormat] = useState<string>("{@}");
 	const [error, setError] = useState<string | undefined>(undefined);
 	const router = useRouter();
 	const [infoEmbed, setInfoEmbed] = useState<Embed>();
-
-	const fileInput = useRef<HTMLInputElement>(null);
-
 
 	useEffect(() => {
 		const initializeEmbed = async () => {
@@ -131,13 +131,13 @@ export default function Home() {
 	useEffect(() => {
 		const loadVaraibleData = async () => {
 			if (!defaultVariables) return;
-			if (!variablesLoaded) {
+			if (!placeholdersLoaded) {
 				loadVariables(defaultVariables);
-				setVariablesLoaded(true);
+				setPlaceholdersLoaded(true);
 			}
 		};
 		loadVaraibleData();
-	}, [router, variables, variablesLoaded]);
+	}, [router, placeholders, placeholdersLoaded]);
 
 	useEffect(() => {
 		const totalCharacters =
@@ -155,22 +155,22 @@ export default function Home() {
 	}, [title, description, fields, footerText, authorName]);
 
 	useEffect(() => {
-		if (!variableFormat.includes("@")) {
+		if (!placeholderFormat.includes("@")) {
 			setError("Placeholder format must contain @");
 			return;
 		}
-		if (variableFormat.startsWith("@")) {
+		if (placeholderFormat.startsWith("@")) {
 			setError("Placeholder format can't start with @");
 			return;
 		}
-		if (variableFormat.endsWith("@")) {
+		if (placeholderFormat.endsWith("@")) {
 			setError("Placeholder format can't end with' @");
 			return;
 		}
 
 		let count = 0;
-		for (let i = 0; i < variableFormat.length; i++) {
-			if (variableFormat.charAt(i) === "@") {
+		for (let i = 0; i < placeholderFormat.length; i++) {
+			if (placeholderFormat.charAt(i) === "@") {
 				count++;
 			}
 		}
@@ -181,14 +181,14 @@ export default function Home() {
 
 		setError(undefined);
 
-	}, [variableFormat]);
+	}, [placeholderFormat]);
 
 	useEffect(() => {
 		const nameCount: { [key: string]: number } = {};
 		let hasDuplicates = false;
 
 		// Count occurrences of each name
-		for (const entry of variables) {
+		for (const entry of placeholders) {
 			if (nameCount[entry.name]) {
 				nameCount[entry.name]++;
 			} else {
@@ -207,39 +207,17 @@ export default function Home() {
 		// Set error if duplicates are found
 		if (hasDuplicates) {
 			setError("Duplicate placeholder names found!");
-		} else if (variables[0] != undefined && variables[0].name.length > 10) {
+		} else if (placeholders[0] != undefined && placeholders[0].name.length > 10) {
 			setError("Placeholder error!");
 		} else {
 			setError(undefined); // Clear the error if no issues
 		}
-	}, [variables]);
+	}, [placeholders]);
 
 	function getRandom(min: number, max: number): number {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-		const handleFileChange = () => {
-		const file = fileInput.current?.files?.[0];
-		if (file && file.type === "application/json") {
-			const reader = new FileReader();
-			reader.onload = () => {
-				var data : string | undefined = reader.result?.toString();
-				if (data === undefined) {
-					setError("Invalid file content!")
-					return;
-				}
-				try {
-					var json = JSON.parse(data)
-					loadJson(json);
-				} catch(err) {
-					setError("Invalid Json!")
-				}
-
-
-			};
-			reader.readAsText(file);
-		}
-	};
 	function isValid(value : any) : boolean {
 		return (value !== undefined && value !== null && String(value).length > 0)
 	}
@@ -266,6 +244,7 @@ export default function Home() {
 		} else {
 			setFields([])
 		}
+		setFieldIndex(embed?.fields?.length)
 
 		setImage(embed?.image?.url ?? "");
 		setThumbnail(embed?.thumbnail?.url ?? "");
@@ -280,22 +259,22 @@ export default function Home() {
 		setUseCurrentTime(embed?.useCurrentTime)
 
 		if (isValid(vars)) {
-			setVariables(vars
-			.map((e:Variable) => ({
+			setPlaceholder(vars
+			.map((e:Placeholder) => ({
 				name: e.name?.trim() ?? undefined,
 				value: e.value?.trim() ?? undefined
-			})).filter((e:Variable) => e.name !== undefined && e.value !== undefined));
+			})).filter((e:Placeholder) => e.name !== undefined && e.value !== undefined));
 		} else {
-			setVariables([])
+			setPlaceholder([])
 		}
 
 		setEmbedLoaded(true);
-		setVariablesLoaded(true);
+		setPlaceholdersLoaded(true);
 	}
 
-	function loadVariables(vars: Variable[]) {
-		setVariables(vars);
-		setVariablesLoaded(true);
+	function loadVariables(vars: Placeholder[]) {
+		setPlaceholder(vars);
+		setPlaceholdersLoaded(true);
 	}
 
 	function loadEmbed(embed: Embed) {
@@ -308,6 +287,7 @@ export default function Home() {
 		setDescription(embed.description ?? "");
 
 		setFields(embed.fields ?? []);
+		setFieldIndex(embed?.fields.length)
 
 		setImage(embed.image ?? "");
 		setThumbnail(embed.thumbnail ?? "");
@@ -324,9 +304,9 @@ export default function Home() {
 		setEmbedLoaded(true);
 	}
 
-	function replaceVar(entry: string, variable: Variable) : string {
-		if (variableFormat.includes("@")) {
-			var format = variableFormat.replace("@",variable.name);
+	function replaceVar(entry: string, variable: Placeholder) : string {
+		if (placeholderFormat.includes("@")) {
+			var format = placeholderFormat.replace("@",variable.name);
 			return entry.replace(format, variable.value);
 		}
 		return entry;
@@ -334,7 +314,7 @@ export default function Home() {
 
 	function replaceVars(entry: string) : string {
 		var newEntry = structuredClone(entry);
-		for(const variable of variables) {
+		for(const variable of placeholders) {
 			newEntry = replaceVar(newEntry, variable);
 		}
 		return newEntry;
@@ -343,7 +323,7 @@ export default function Home() {
 	function repalceVars(embed: Embed) : Embed {
 		const newEmbed = structuredClone(embed);
 
-		for(const entry of variables) {
+		for(const entry of placeholders) {
 
 			newEmbed.author.name = replaceVar(newEmbed.author.name, entry);
 			newEmbed.author.iconUrl = replaceVar(newEmbed.author.iconUrl, entry);
@@ -400,75 +380,13 @@ export default function Home() {
 		useCurrentTime: useCurrentTime
 	};
 
-	const [copied, setCopied] = useState(false);
-
-	const handleCopy = () => {
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
-	};
-
 	return (
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
 				<div className="flex justify-center items-baseline title-container">
 					<img className="title" src="/assets/img/title.png" alt="" />
 				</div>
-				<div>
-					<div className="flex mt-1 mb-1 gap-2 justify-center">
-						<button
-							type="button"
-							onClick={() => {
-								setAllDetails(false);
-								setAuthorName("");
-								setAuthorIcon("");
-								setAuthorUrl("");
-								setTitle("");
-								setUrl("");
-								setDescription("");
-								setFields([]);
-								setVariables([]);
-								setImage("");
-								setThumbnail("");
-								setColorEnabled(false);
-								setFooterText("");
-								setFooterIcon("");
-								setTimestamp(undefined);
-								setUseCurrentTime(false)
-								setError(undefined);
-							}}
-							className={button("red")}
-						>
-							Clear All
-						</button>
 
-						<button
-							type="button"
-							onClick={() => setAllDetails(true)}
-							className={button()}
-						>
-							Expand All
-						</button>
-						<button
-							type="button"
-							onClick={() => setAllDetails(false)}
-							className={button()}
-						>
-							Collapse All
-						</button>
-
-						<input type="file" hidden accept="application/json" ref={fileInput} onChange={handleFileChange} />
-						<button
-							type="button"
-							onClick={() => fileInput.current?.click()}
-							className={button()}
-						>
-							Import
-						</button>
-						<CopyToClipboard text={embedToObjectCode(embed,variables,false)} onCopy={handleCopy}>
-							<button type="button" className={button()}>{copied ? 'Copied!' : 'Copy'}</button>
-						</CopyToClipboard>
-					</div>
-				</div>
 
 				{error ? (
 					<div className="px-4 py-2 rounded bg-[#d83c3e] font-semibold text-white">
@@ -478,7 +396,7 @@ export default function Home() {
 
 				<details open className="variables">
 					<summary>
-							<h2>Placeholders &ndash; {variables.length}</h2>
+							<h2>Placeholders &ndash; {placeholders.length}</h2>
 					</summary>
 					<div className="variable-info">
 						<h2 className="variable-info-title">What are placeholders?</h2>
@@ -493,23 +411,23 @@ export default function Home() {
 							required={true}
 							type="text"
 							id={`variable-format`}
-							value={variableFormat}
+							value={placeholderFormat}
 							onChange={e => {
 								setVariableFormat(e.target.value.toLowerCase());
 							}}
 						/>
 					</div>
-					{variables.map((varaible, index) => (
+					{placeholders.map((placeholder, index) => (
 						<details key={index}>
-							<p>{varaible.name.length > 0 ? "Usage: " +variableFormat.replace("@",varaible.name) : ""}</p>
+							<p>{placeholder.name.length > 0 ? "Usage: " +placeholderFormat.replace("@",placeholder.name) : ""}</p>
 							<summary>
 								<h3 className="text-white font-semibold mr-auto">
-									Palceholder: {varaible.name}
+									Palceholder: {placeholder.name}
 								</h3>
 								<button
 									onClick={() => {
-										setVariables(
-											variables.filter((_, i) => i !== index)
+										setPlaceholder(
+											placeholders.filter((_, i) => i !== index)
 										);
 									}}
 									className={button("red")}
@@ -526,11 +444,11 @@ export default function Home() {
 									required={true}
 									type="text"
 									id={`variable-name-${index}`}
-									value={varaible.name}
+									value={placeholder.name}
 									onChange={e => {
-										const newVar = [...variables];
+										const newVar = [...placeholders];
 										newVar[index].name = e.target.value.toLowerCase();
-										setVariables(newVar);
+										setPlaceholder(newVar);
 									}}
 								/>
 							</div>
@@ -543,11 +461,11 @@ export default function Home() {
 									required={true}
 									type="text"
 									id={`variable-value-${index}`}
-									value={varaible.value}
+									value={placeholder.value}
 									onChange={e => {
-										const newVar = [...variables];
+										const newVar = [...placeholders];
 										newVar[index].value = e.target.value;
-										setVariables(newVar);
+										setPlaceholder(newVar);
 									}}
 								/>
 							</div>
@@ -556,18 +474,15 @@ export default function Home() {
 					<button
 						type="button"
 						onClick={() => {
-							if (variables.length < 25)
-								setVariables([
-									...variables,
-									{
-										name: "ph-" + getRandom(1000,9000),
-										value: "Foxes are cute!"
-									}
-								]);
+							setPlaceholder([
+								...placeholders,
+								{
+									name: "ph-" + getRandom(1000,9000),
+									value: "Foxes are cute!"
+								}
+							]);
 						}}
-						className={`mt-4 ${button(
-							variables.length < 25 ? "blue" : "disabled"
-						)}`}
+						className={`mt-4 ${button()}`}
 					>
 						Add Palceholder
 					</button>
@@ -659,9 +574,7 @@ export default function Home() {
 										];
 										setFields(newFields);
 									}}
-									className={button(
-										"blue"
-									)}
+									className={button()}
 								>
 									UP
 								</button>
@@ -678,9 +591,7 @@ export default function Home() {
 										];
 										setFields(newFields);
 									}}
-									className={button(
-										"blue"
-									)}
+									className={button()}
 								>
 									Down
 								</button>
@@ -690,7 +601,7 @@ export default function Home() {
 											fields.filter((_, i) => i !== index)
 										);
 									}}
-									className={button("red")}
+									className={button()}
 								>
 									Delete
 								</button>
@@ -767,15 +678,16 @@ export default function Home() {
 								setFields([
 									...fields,
 									{
-										name: "A New Field",
-										value: "",
-										inline: false,
+										name: "Field #" + (fieldIndex +1),
+										value: "Content of Field #" + (fieldIndex +1),
+										inline: true,
 										blank: false
 									}
 								]);
+								setFieldIndex(fieldIndex+1)
 						}}
 						className={`mt-4 ${button(
-							fields.length < 25 ? "blue" : "disabled"
+							fields.length < 25 ? "red" : "disabled"
 						)}`}
 					>
 						Add Field
@@ -840,7 +752,7 @@ export default function Home() {
 
 				<EmbedBase embed={repalceVars(embed)} errors={error} />
 
-				<Output embed={embed} variables={variables} errors={error} />
+				<Output embed={embed} placeholders={placeholders} errors={error} />
 			</div>
 		</div>
 	);

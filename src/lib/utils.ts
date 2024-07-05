@@ -1,15 +1,15 @@
-import type { Embed, Variable, outputData } from "./interfaces";
+import type { Embed, Placeholder, outputData } from "./interfaces";
 import moment from 'moment';
 
 export function embedToPartial(embed: Embed): Partial<Embed> {
 	return clearEmptySlots(embed);
 }
 
-export function embedToObjectCode(em: Embed, varData: Variable[], removeKeyQuotes = true) : string {
+export function embedToObjectCode(em: Embed, Placeholders: Placeholder[], removeKeyQuotes = true) : string {
 
 	var cont : outputData = {
 		embed: em,
-		variables: varData
+		placeholders: Placeholders
 	}
 
 	const output = JSON.stringify(clearEmptySlots(cont, true), null, 2);
