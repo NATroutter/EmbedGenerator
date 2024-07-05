@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { Embed } from "../lib/interfaces";
+import type { Embed, Placeholder } from "../lib/interfaces";
 import { embedToObjectCode } from "../lib/utils";
 import Highlight from "./Highlight";
 
@@ -17,7 +17,7 @@ function s(strings: TemplateStringsArray, ...values: unknown[]) {
 	return escaped;
 }
 
-export default function Output({ embed, variables, errors }: { embed: Embed, variables: Variable[], errors: string | undefined }) {
+export default function Output({ embed, placeholders, errors }: { embed: Embed, placeholders: Placeholder[], errors: string | undefined }) {
 	const [language, setLanguage] = useState<"json">("json");
 
 	if (errors !== undefined) {
@@ -27,7 +27,7 @@ export default function Output({ embed, variables, errors }: { embed: Embed, var
 		);
 	}
 
-	let output = embedToObjectCode(embed, variables, false);
+	let output = embedToObjectCode(embed, placeholders, false);
 
 	return (
 		<div className="mt-8">

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import LimitedInput from "../components/LimitedInput";
 import Output from "../components/Output";
@@ -380,13 +380,74 @@ export default function Home() {
 		useCurrentTime: useCurrentTime
 	};
 
+	interface Penis {
+		test1: string,
+		test2: string
+	}
+
 	return (
 		<div className="screen flex min-h-screen">
 			<div className="flex-1 embed-inputs">
 				<div className="flex justify-center items-baseline title-container">
 					<img className="title" src="/assets/img/title.png" alt="" />
 				</div>
+				<div>
+					<div className="flex mt-1 mb-1 gap-2 justify-center">
+						<BasicButton onClick={() => {
+								setAllDetails(false);
+								setAuthorName("");
+								setAuthorIcon("");
+								setAuthorUrl("");
+								setTitle("");
+								setUrl("");
+								setDescription("");
+								setFields([]);
+								setFieldIndex(0)
+								setPlaceholder([]);
+								setImage("");
+								setThumbnail("");
+								setColorEnabled(false);
+								setFooterText("");
+								setFooterIcon("");
+								setTimestamp(undefined);
+								setUseCurrentTime(false)
+								setError(undefined);
+							}}>Clear All</BasicButton>
+						<BasicButton onClick={()=> infoEmbed !== undefined && loadEmbed(infoEmbed)}>Reset</BasicButton>
+						<BasicButton onClick={() => setAllDetails(true)}>Expand All</BasicButton>
+						<BasicButton onClick={() => setAllDetails(false)}>Collapse All</BasicButton>
+					</div>
+					<div className="flex mt-1 mb-1 gap-2 justify-center">
+						<ImportButton text="Import (Json)" allowedTypes={[
+							FileTypes.JSON
+						]} onError={(err)=>setError(err)} onLoad={(data)=>{
+							try {
+								loadJson(JSON.parse(data));
+							} catch {
+								setError("Invalid Json!")
+							}
+						}} />
 
+						<ExportButton text="Export (Json)" fileName="Embed" fileExt="json" content={embedToObjectCode(embed,placeholders,false)}/>
+
+						<CopyButton content={embedToObjectCode(embed,placeholders,false)}>Copy (Json)</CopyButton>
+					</div>
+					<div className="flex mt-1 mb-1 gap-2 justify-center">
+						<ImportButton text="Import (Base64)" allowedTypes={[
+							FileTypes.TXT
+						]} onError={(err)=>setError(err)} onLoad={(data)=>{
+							try {
+								loadJson(JSON.parse(atob(data)));
+							} catch {
+								setError("Invalid Base64!")
+							}
+						}} />
+
+						<ExportButton text="Export (Baase64)" fileName="Embed" fileExt="txt" content={btoa(embedToObjectCode(embed,placeholders,false))}/>
+
+						<CopyButton content={btoa(embedToObjectCode(embed,placeholders,false))}>Copy (Base64)</CopyButton>
+					</div>
+				</div>
 
 				{error ? (
 					<div className="px-4 py-2 rounded bg-[#d83c3e] font-semibold text-white">
@@ -749,7 +810,6 @@ export default function Home() {
 			</div>
 
 			<div className="flex-1 bg-[#36393f] p-8">
-
 				<EmbedBase embed={repalceVars(embed)} errors={error} />
 
 				<Output embed={embed} placeholders={placeholders} errors={error} />
