@@ -4,6 +4,7 @@ import { blockQuote } from "./rules/blockQuote";
 import { codeBlock } from "./rules/codeBlock";
 import { emphasis } from "./rules/emphasis";
 import { escape } from "./rules/escape";
+import { header } from "./rules/header";
 import { inlineCode } from "./rules/inlineCode";
 import { lineBreak } from "./rules/lineBreak";
 import { link } from "./rules/link";
@@ -19,6 +20,7 @@ import { url } from "./rules/url";
 
 export const parsers = {
 	content: createParser({
+		header,
 		autolink,
 		blockQuote,
 		codeBlock,
@@ -38,6 +40,7 @@ export const parsers = {
 		url
 	}),
 	header: createParser({
+		header,
 		autolink,
 		blockQuote,
 		emphasis,

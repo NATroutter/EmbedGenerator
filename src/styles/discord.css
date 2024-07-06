@@ -1,3 +1,31 @@
+.header-1 {
+	font-size: 1.5rem;
+	margin: 16px 0 8px;
+	font-weight: 700;
+	line-height: 1.375em;
+}
+.header-1:first-child {
+	margin-top: 8px;
+}
+.header-2 {
+	font-size: 1.25rem;
+	margin: 16px 0 8px;
+	font-weight: 700;
+	line-height: 1.375em;
+}
+.header-2:first-child {
+	margin-top: 8px;
+}
+.header-3 {
+	font-size: 1rem;
+	margin: 16px 0 8px;
+	font-weight: 700;
+	line-height: 1.375em;
+}
+.header-3:first-child {
+	margin-top: 4px;
+}
+
 .bot-tag {
 	/* background: #7289da; */
 	font-size: 10px;
@@ -935,7 +963,8 @@
 	white-space: pre-line;
 	/* margin-top: 0 !important; */
 	font-size: 14px !important;
-	line-height: 16px !important
+	line-height: 16px !important;
+	word-break: break-word;
 }
 
 .embed .embed-description.markup pre {
